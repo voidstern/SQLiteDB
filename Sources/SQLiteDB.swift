@@ -6,13 +6,14 @@
 //  Copyright (c) 2014 RookSoft Pte. Ltd. All rights reserved.
 //
 import Foundation
+import SQLite3
 
 // MARK:- SQLiteDB Class
 /// Simple wrapper class to provide basic SQLite database access.
 @objc(SQLiteDB)
-class SQLiteDB: SQLiteBase {
+public class SQLiteDB: SQLiteBase {
 	/// Does this database have CloudKit support for remote data saving?
-	var cloudEnabled = false {
+    public var cloudEnabled = false {
 		didSet {
 			if cloudEnabled {
 				self.cloudDB = CloudDB.shared
@@ -22,7 +23,7 @@ class SQLiteDB: SQLiteBase {
 		}
 	}
 	/// Singleton instance for access to the SQLiteDB class
-	static let shared = SQLiteDB()
+    public static let shared = SQLiteDB()
 	/// Internal reference to CloudDB instance
 	private var cloudDB: CloudDB!
 	
@@ -31,7 +32,7 @@ class SQLiteDB: SQLiteBase {
 	}
 	
 	/// Output the current SQLite database path
-	override var description:String {
+    public override var description:String {
 		return "SQLiteDB: \(path ?? "")"
 	}
 
@@ -40,7 +41,7 @@ class SQLiteDB: SQLiteBase {
 	///
 	/// - Parameter copyFile: Whether to copy the file named in `DB_NAME` from resources or to create a new empty database file. Defaults to `true`
 	/// - Returns: Returns a boolean value indicating if the database was successfully opened or not.
-	override func open(dbPath: String = "", copyFile: Bool = true, inMemory: Bool = false) -> Bool {
+    public override func open(dbPath: String = "", copyFile: Bool = true, inMemory: Bool = false) -> Bool {
 		NSLog("DB Open called with path: \(dbPath)")
 		var path = ""
 		if !inMemory {
@@ -64,7 +65,7 @@ class SQLiteDB: SQLiteBase {
 	/// Close the currently open SQLite database. Before closing the DB, the framework automatically takes care of optimizing the DB at frequent intervals by running the following commands:
 	/// 1. **VACUUM** - Repack the DB to take advantage of deleted data
 	/// 2. **ANALYZE** - Gather information about the tables and indices so that the query optimizer can use the information to make queries work better.
-	override func closeDB() {
+    public override func closeDB() {
 		if db != nil {
 			// Get launch count value
 			let ud = UserDefaults.standard

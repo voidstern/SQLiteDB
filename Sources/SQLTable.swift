@@ -11,21 +11,21 @@ import CloudKit
 
 /// Enumerator to be used in fetching data via some methods where you might need to specify whether you want all records, only records marked for deletion, or only records not marked for deletion.
 @objc
-enum FetchType: Int {
+public enum FetchType: Int {
 	case all, deleted, nondeleted
 }
 
 @objc
-enum DBType: Int {
+public enum DBType: Int {
 	case none, publicDB, privateDB, sharedDB
 }
 
-protocol SQLTableProtocol {}
+public protocol SQLTableProtocol {}
 
 // MARK: - SQLiteDB Class
 /// Base class for providing object-based access to SQLite tables. Simply define the properties and their default values (a value has to be there in order to determine value type) and SQLTable will handle the basic CRUD (creating, reading, updating, deleting) actions for you without any additional code.
 @objcMembers
-class SQLTable: NSObject, SQLTableProtocol, Identifiable {
+public class SQLTable: NSObject, SQLTableProtocol, Identifiable {
 	/// Every SQLTable sub-class will contain an `isDeleted` flag. Instead of deleting records, you should set the flag to `true` for deletions and filter your data accordingly when fetching data from `SQLTable`. This flag will be used to synchronize deletions via CloudKit
 	public var isDeleted = false
 
@@ -63,7 +63,7 @@ class SQLTable: NSObject, SQLTableProtocol, Identifiable {
 	}
 
 	/// Base initialization which sets up the table name and then verifies that the table exists in the DB, and if it does not, creates it.
-	override required init() {
+    public override required init() {
 		super.init()
 		// Table name
 		self.table = type(of: self).table
@@ -104,7 +104,7 @@ class SQLTable: NSObject, SQLTableProtocol, Identifiable {
 	}
 
 	// MARK: - NSCoding / NSCopying Support
-	func copy(to: SQLTable) {
+    public func copy(to: SQLTable) {
 		to.created = created
 		to.updated = updated
 		to.isDeleted = isDeleted

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SQLite3
 
 let SQLITE_DATE = SQLITE_NULL + 1
 
@@ -17,7 +18,7 @@ private let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.sel
 
 /// Simple wrapper class to provide basic SQLite database access as a non-singleton
 @objc(SQLiteBase)
-class SQLiteBase: NSObject {
+public class SQLiteBase: NSObject {
 	/// The SQLite database file name - defaults to `data.db`.
 	var DB_NAME = "data.db"
     /// Shared group identifier - if specified, then the database will be copied to the shared group location
@@ -33,7 +34,7 @@ class SQLiteBase: NSObject {
 	/// Internal reference to the currently open database path
 	internal var path: String!
 	
-	override init() {
+    public override init() {
 		super.init()
 		// Set up essentials
 		queue = DispatchQueue(label: QUEUE_LABEL, attributes: [])
@@ -48,7 +49,7 @@ class SQLiteBase: NSObject {
 	}
 	
 	/// Output the current SQLite database path
-	override var description: String {
+    public override var description: String {
 		return "SQLiteBase: \(path ?? "")"
 	}
 
@@ -60,7 +61,10 @@ class SQLiteBase: NSObject {
 	/// 	- copyFile: Whether to copy the file at `dbPath` to the standard disk location or to create a new empty database file. Defaults to `false`
 	/// 	- inMemory: Whether to create an in-memory DB or a disk-based DB
 	/// - Returns: Returns a boolean value indicating if the database was successfully opened or not.
-	func open(dbPath: String, copyFile: Bool = false, inMemory: Bool = false) -> Bool {
+    ///
+    ///
+    @discardableResult
+    public func open(dbPath: String, copyFile: Bool = false, inMemory: Bool = false) -> Bool {
 		if db != nil {
 			closeDB()
 		}
@@ -140,7 +144,7 @@ class SQLiteBase: NSObject {
 	}
 	
 	/// Close the currently open SQLite database.
-	func closeDB() {
+    public func closeDB() {
 		if db != nil {
 			sqlite3_close(db)
 			db = nil
@@ -161,7 +165,9 @@ class SQLiteBase: NSObject {
 	///   - sql: The SQL statement to be executed
 	///   - parameters: An array of optional parameters in case the SQL statement includes bound parameters - indicated by `?`
 	/// - Returns: The ID for the last inserted row (if it was an INSERT command and the ID is an integer column) or a result code indicating the status of the command execution. A non-zero result indicates success and a 0 indicates failure.
-	func execute(sql: String, parameters: [Any]? = nil) -> Int {
+
+    @discardableResult
+    public func execute(sql: String, parameters: [Any]? = nil) -> Int {
 		assert(db != nil, "Database has not been opened! Use the openDB() method before any DB queries.")
 		var result = 0
 		queue.sync {
@@ -178,7 +184,7 @@ class SQLiteBase: NSObject {
 	///   - sql: The SQL query to be executed
 	///   - parameters: An array of optional parameters in case the SQL statement includes bound parameters - indicated by `?`
 	/// - Returns: An empty array if the query resulted in no rows. Otherwise, an array of dictionaries where each dictioanry key is a column name and the value is the column value.
-	func query(sql: String, parameters: [Any]? = nil) -> [[String: Any]] {
+    public func query(sql: String, parameters: [Any]? = nil) -> [[String: Any]] {
 		assert(db != nil, "Database has not been opened! Use the openDB() method before any DB queries.")
 		var rows = [[String: Any]]()
 		queue.sync {
@@ -192,7 +198,7 @@ class SQLiteBase: NSObject {
 	/// Get the current internal DB version
 	///
 	/// - Returns: An interger indicating the current internal DB version as set by the developer via code. If a DB version was not set, this defaults to 0.
-	func getDBVersion() -> Int {
+    public func getDBVersion() -> Int {
 		assert(db != nil, "Database has not been opened! Use the openDB() method before any DB queries.")
 		var version = 0
 		let arr = query(sql: "PRAGMA user_version")
